@@ -1,0 +1,9 @@
+---
+
+vmware_folder_parent: ""
+
+vmware_vcenter_connection_info:
+  hostname: "{{ vmware_vcenter_hostname }}"
+  username: "{{ vmware_vcenter_username }}"
+  password: "{{ vmware_vcenter_password }}"
+  validate_certs: "{{ vmware_vcenter_validate_certs }}"

@@ -1,0 +1,16 @@
+---
+
+- name: vCenter folders
+  include_tasks:
+    file: folder.yml
+  loop: "{{ vmware_folder_path | default('') | ansible.builtin.split('/') }}"
+  when: vmware_folder_name != ''
+  loop_control:
+    loop_var: "vmware_folder_name"
+
+# Apply specs to the virtual machine
+- name: VM deployment configuration
+  community.vmware.vmware_guest: "{{ vmware_vm_spec | combine(vmware_vcenter_connection_info) | combine(vmware_vm_spec_override) }}"
+  loop: "{{ vmware_vm_specs }}"
+  loop_control:
+    loop_var: vmware_vm_spec

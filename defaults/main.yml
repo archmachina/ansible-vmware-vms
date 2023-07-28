@@ -1,0 +1,9 @@
+---
+
+vmware_vm_spec_override: {}
+
+vmware_vcenter_validate_certs: true
+
+vmware_vcenter_hostname: "{{ undef(hint='vCenter hostname must be defined') }}"
+vmware_vcenter_username: "{{ undef(hint='vCenter username must be defined') }}"
+vmware_vcenter_password: "{{ undef(hint='vCenter password must be defined') }}"
