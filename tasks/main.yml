@@ -8,6 +8,17 @@
   loop_control:
     loop_var: "vmware_folder_name"
 
+- name: Move existing VM
+  community.vmware.vmware_guest_move:
+    hostname: "{{ vmware_vcenter_hostname }}"
+    username: "{{ vmware_vcenter_username }}"
+    password: "{{ vmware_vcenter_password }}"
+    validate_certs: false
+    datacenter: "{{ vmware_datacenter }}"
+    dest_folder: "{{ vmware_datacenter }}/vm/{{ vmware_folder_path }}"
+    name: "{{ vmware_vm_name }}"
+  ignore_errors: true
+
 # Apply specs to the virtual machine
 - name: VM deployment configuration
   community.vmware.vmware_guest: "{{ vmware_vm_spec | combine(vmware_vcenter_connection_info) | combine(vmware_vm_spec_override) }}"
