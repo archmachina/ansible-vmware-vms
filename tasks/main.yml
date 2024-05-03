@@ -8,6 +8,30 @@
   loop_control:
     loop_var: "vmware_folder_name"
 
+- block:
+    - name: Get VM information
+      community.vmware.vmware_guest_find:
+        hostname: "{{ vmware_vcenter_hostname }}"
+        username: "{{ vmware_vcenter_username }}"
+        password: "{{ vmware_vcenter_password }}"
+        validate_certs: false
+        name: "{{ vmware_vm_name }}"
+      register: vmware_vm_find
+      check_mode: false
+  rescue:
+    # If it failed because it couldn't find the VM, don't actually fail
+    - name: Check failure status
+      ansible.builtin.fail:
+        msg: "VMware find failed: {{ vmware_vm_find }}"
+      when: "'Unable to find folders for virtual machine' not in vmware_vm_find.msg"
+
+- name: Check for multiple matches
+  ansible.builtin.fail:
+    msg: "Multiple matches for VMware find"
+  when:
+    - "'folders' in vmware_vm_find"
+    - vmware_vm_find.folders | length > 1
+
 - name: Move existing VM
   community.vmware.vmware_guest_move:
     hostname: "{{ vmware_vcenter_hostname }}"
@@ -17,7 +41,10 @@
     datacenter: "{{ vmware_datacenter }}"
     dest_folder: "{{ vmware_datacenter }}/vm/{{ vmware_folder_path }}"
     name: "{{ vmware_vm_name }}"
-  ignore_errors: true
+  when:
+    - "vmware_folder_path|default('') != ''"
+    - "'folders' in vmware_vm_find"
+    - vmware_vm_find.folders | length > 0
 
 # Apply specs to the virtual machine
 - name: VM deployment configuration
